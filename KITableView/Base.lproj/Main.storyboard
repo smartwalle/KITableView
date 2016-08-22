@@ -17,12 +17,18 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" tag="1001" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="4bB-ms-j9X">
+                            <tableView clipsSubviews="YES" tag="1001" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="4bB-ms-j9X">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="4bB-ms-j9X" secondAttribute="bottom" id="5m1-5o-0ql"/>
+                            <constraint firstItem="4bB-ms-j9X" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="5sr-TE-Gc7"/>
+                            <constraint firstItem="4bB-ms-j9X" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="KY1-D7-IN0"/>
+                            <constraint firstAttribute="trailing" secondItem="4bB-ms-j9X" secondAttribute="trailing" id="LUO-8m-MhK"/>
+                        </constraints>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                 </viewController>

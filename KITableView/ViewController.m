@@ -24,6 +24,8 @@
     self.tableViewAgent = [[KITableViewAgent alloc] init];
     [self.tableViewAgent setTableView:self.tableView];
     
+    __weak ViewController *weakSelf = self;
+    
     // cell 1
     KICell *cell = [[KICell alloc] init];
     [cell setHeight:100];
@@ -39,7 +41,8 @@
         KISection *s = [[KISection alloc] init];
         [s setHeightForHeader:40];
         [s setTitleForHeader:@"我是刚刚添加的 Section"];
-        [self.tableViewAgent appendSecton:s];
+        [weakSelf.tableViewAgent appendSecton:s];
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }];
     
     
@@ -65,7 +68,8 @@
             [cell.textLabel setText:@"我是刚刚添加的 Cell"];
             return cell;
         }];
-        [self.tableViewAgent appendCell:c3 withSection:0];
+        [weakSelf.tableViewAgent appendCell:c3 withSection:0];
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }];
     
     
