@@ -163,6 +163,47 @@
     if (cell == nil || indexPath == nil) {
         return;
     }
+    
+    [self insertCells:@[cell] withIndexPath:indexPath withRowAnimation:animation];
+}
+
+- (void)appendCell:(KICell *)cell withSection:(NSInteger)section {
+    [self appendCell:cell withSection:section withRowAnimation:UITableViewRowAnimationNone];
+}
+
+- (void)appendCell:(KICell *)cell withSection:(NSInteger)section withRowAnimation:(UITableViewRowAnimation)animation {
+    if (cell == nil) {
+        return ;
+    }
+    [self appendCells:@[cell] withSection:section withRowAnimation:animation];
+}
+
+- (void)appendCells:(NSArray *)cells {
+    NSInteger section = self.dataSource.count - 1;
+    section = MAX(section, 0);
+    [self appendCells:cells withSection:section];
+}
+     
+- (void)appendCells:(NSArray *)cells withSection:(NSInteger)section {
+    [self appendCells:cells withSection:section withRowAnimation:UITableViewRowAnimationNone];
+}
+
+- (void)appendCells:(NSArray *)cells withSection:(NSInteger)section withRowAnimation:(UITableViewRowAnimation)animation {
+    NSInteger row = 0;
+    KISection *s = [self sectionAtIndex:section];
+    if (s != nil) {
+        row = [[s cells] count];
+    }
+    [self insertCells:cells
+        withIndexPath:[NSIndexPath indexPathForRow:row inSection:section]
+     withRowAnimation:animation];
+}
+
+- (void)insertCells:(NSArray *)cells withIndexPath:(NSIndexPath *)indexPath withRowAnimation:(UITableViewRowAnimation)animation {
+    if (cells == nil || cells.count == 0 || indexPath == nil) {
+        return;
+    }
+    
     BOOL sectionExists = YES;
     
     NSInteger section = indexPath.section;
@@ -173,32 +214,47 @@
         sectionExists = NO;
     }
     
-    [s insertCell:cell withIndex:indexPath.row];
+    [s insertCells:cells withIndex:indexPath.row];
     
     [self.tableView beginUpdates];
     if (sectionExists) {
-        [self.tableView insertRowsAtIndexPaths:@[indexPath]
+        NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+        for (int i=0; i<cells.count; i++) {
+            NSIndexPath *temp = [NSIndexPath indexPathForRow:i+indexPath.row inSection:section];
+            [indexPaths addObject:temp];
+        }
+        [self.tableView insertRowsAtIndexPaths:indexPaths
                               withRowAnimation:animation];
     } else {
-        [self.tableView insertSections:[NSIndexSet indexSetWithIndex:indexPath.section]
+        [self.tableView insertSections:[NSIndexSet indexSetWithIndex:section]
                       withRowAnimation:animation];
     }
     [self.tableView endUpdates];
 }
 
-- (void)appendCell:(KICell *)cell withSection:(NSInteger)section {
-    [self appendCell:cell withSection:section withRowAnimation:UITableViewRowAnimationNone];
-}
-
-- (void)appendCell:(KICell *)cell withSection:(NSInteger)section withRowAnimation:(UITableViewRowAnimation)animation {
-    NSInteger row = 0;
-    KISection *s = [self sectionAtIndex:section];
-    if (s != nil) {
-        row = [[s cells] count];
+- (void)deleteCellsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
+    NSArray *newIndexPaths = [indexPaths sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        NSIndexPath *indexPath1 = (NSIndexPath *)obj1;
+        NSIndexPath *indexPath2 = (NSIndexPath *)obj2;
+        
+        if (indexPath1.row > indexPath2.row) {
+            return NSOrderedAscending;
+        } else if (indexPath1.row < indexPath2.row) {
+            return NSOrderedDescending;
+        }
+        return NSOrderedSame;
+    }];
+    
+    for (NSIndexPath *indexPath in newIndexPaths) {
+        KISection *s = [self.dataSource objectAtIndex:indexPath.section];
+        if (s != nil) {
+            [s removeCellAtIndex:indexPath.row];
+        }
     }
-    [self insertCell:cell
-       withIndexPath:[NSIndexPath indexPathForRow:row inSection:section]
-    withRowAnimation:animation];
+    
+    [self.tableView beginUpdates];
+    [self.tableView deleteRowsAtIndexPaths:newIndexPaths withRowAnimation:animation];
+    [self.tableView endUpdates];
 }
 
 #pragma mark - Getters & Setters

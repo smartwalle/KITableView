@@ -26,6 +26,9 @@
 - (KICell *)cellAtIndex:(NSInteger)index;
 
 - (void)insertCell:(KICell *)cell withIndex:(NSInteger)index;
+- (void)insertCells:(NSArray *)cells withIndex:(NSInteger)index;
+
+- (void)removeCellAtIndex:(NSInteger)index;
 
 - (void)setDidSelectRowAtIndexPathBlock:(KITableViewDidSelectRowAtIndexPathBlock)block;
 - (KITableViewDidSelectRowAtIndexPathBlock)didSelectRowAtIndexPath;

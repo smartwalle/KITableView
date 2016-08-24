@@ -40,7 +40,9 @@
     [cell setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
         KISection *s = [[KISection alloc] init];
         [s setHeightForHeader:40];
-        [s setTitleForHeader:@"我是刚刚添加的 Section"];
+        [s setTitleForHeader:@"我是刚刚添加的 Section Header"];
+        [s setHeightForFooter:30];
+        [s setTitleForFooter:@"我是刚刚添加的 Section Footer"];
         [weakSelf.tableViewAgent appendSecton:s];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }];
@@ -58,17 +60,40 @@
         return cell;
     }];
     [cell2 setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
-        KICell *c3 = [[KICell alloc] init];
-        [c3 setHeight:80];
-        [c3 setCellAtIndexPath:^UITableViewCell *(UITableView *tableView, NSIndexPath *indexPath) {
-            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"dd"];
-            if (cell == nil) {
-                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"dd"];
-            }
-            [cell.textLabel setText:@"我是刚刚添加的 Cell"];
-            return cell;
-        }];
-        [weakSelf.tableViewAgent appendCell:c3 withSection:0];
+        
+        NSMutableArray *cells = [[NSMutableArray alloc] init];
+        for (int i=0; i<20; i++) {
+            KICell *c3 = [[KICell alloc] init];
+            [c3 setHeight:20];
+            [c3 setCellAtIndexPath:^UITableViewCell *(UITableView *tableView, NSIndexPath *indexPath) {
+                UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"dd"];
+                if (cell == nil) {
+                    cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"dd"];
+                }
+                [cell.textLabel setText:[NSString stringWithFormat:@"我是刚刚添加的 Cell %d", i]];
+                return cell;
+            }];
+            [c3 setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
+                [weakSelf.tableViewAgent deleteCellsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:1]] withRowAnimation:UITableViewRowAnimationFade];
+            }];
+            [cells addObject:c3];
+        }
+        
+        [weakSelf.tableViewAgent insertCells:cells
+                               withIndexPath:[NSIndexPath indexPathForRow:0 inSection:1]
+                            withRowAnimation:UITableViewRowAnimationFade];
+        
+//        KICell *c3 = [[KICell alloc] init];
+//        [c3 setHeight:80];
+//        [c3 setCellAtIndexPath:^UITableViewCell *(UITableView *tableView, NSIndexPath *indexPath) {
+//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"dd"];
+//            if (cell == nil) {
+//                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"dd"];
+//            }
+//            [cell.textLabel setText:@"我是刚刚添加的 Cell"];
+//            return cell;
+//        }];
+//        [weakSelf.tableViewAgent appendCell:c3 withSection:0];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }];
     

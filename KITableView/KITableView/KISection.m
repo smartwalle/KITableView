@@ -22,6 +22,15 @@
     [self.cellList insertObject:cell atIndex:index];
 }
 
+- (void)insertCells:(NSArray *)cells withIndex:(NSInteger)index {
+    [self.cellList insertObjects:cells
+                       atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, cells.count)]];
+}
+
+- (void)removeCellAtIndex:(NSInteger)index {
+    [self.cellList removeObjectAtIndex:index];
+}
+
 - (NSArray *)cells {
     return [self cellList];
 }
