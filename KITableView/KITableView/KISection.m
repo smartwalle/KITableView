@@ -13,6 +13,11 @@
 
 @property (nonatomic, copy) KITableViewDidSelectRowAtIndexPathBlock   tableViewDidSelectRowAtIndexPathBlock;
 @property (nonatomic, copy) KITableViewDidDeselectRowAtIndexPathBlock tableViewDidDeselectRowAtIndexPathBlock;
+
+@property (nonatomic, copy) KITableViewWillDisplayHeaderViewForSectionBlock tableViewWillDisplayHeaderViewForSectionBlock;
+@property (nonatomic, copy) KITableViewWillDisplayFooterViewForSectionBlock tableViewWillDisplayFooterViewForSectionBlock;
+@property (nonatomic, copy) KITableViewDidEndDisplayingHeaderViewForSectionBlock tableViewDidEndDisplayingHeaderViewForSectionBlock;
+@property (nonatomic, copy) KITableViewDidEndDisplayingFooterViewForSectionBlock tableViewDidEndDisplayingFooterViewForSectionBlock;
 @end
 
 @implementation KISection
@@ -36,7 +41,10 @@
 }
 
 - (KICell *)cellAtIndex:(NSInteger)index {
-    return [self.cellList objectAtIndex:index];
+    if (self.cellList.count > index) {
+        return [self.cellList objectAtIndex:index];
+    }
+    return nil;
 }
 
 #pragma mark - Getters & Setters
@@ -61,6 +69,38 @@
 
 - (KITableViewDidDeselectRowAtIndexPathBlock)didDeselectRowAtIndexPath {
     return self.tableViewDidDeselectRowAtIndexPathBlock;
+}
+
+- (void)setWillDisplayHeaderViewForSectionBlock:(KITableViewWillDisplayHeaderViewForSectionBlock)block {
+    [self setTableViewWillDisplayHeaderViewForSectionBlock:block];
+}
+
+- (KITableViewWillDisplayHeaderViewForSectionBlock)willDisplayHeaderViewForSectionBlock {
+    return self.tableViewWillDisplayHeaderViewForSectionBlock;
+}
+
+- (void)setWillDisplayFooterViewForSectionBlock:(KITableViewWillDisplayFooterViewForSectionBlock)block {
+    [self setTableViewWillDisplayFooterViewForSectionBlock:block];
+}
+
+- (KITableViewWillDisplayFooterViewForSectionBlock)willDisplayFooterViewForSectionBlock {
+    return self.tableViewWillDisplayFooterViewForSectionBlock;
+}
+
+- (void)setDidEndDisplayingHeaderViewForSectionBlock:(KITableViewDidEndDisplayingHeaderViewForSectionBlock)block {
+    [self setTableViewDidEndDisplayingHeaderViewForSectionBlock:block];
+}
+
+- (KITableViewDidEndDisplayingHeaderViewForSectionBlock)didEndDisplayingHeaderViewForSectionBlock {
+    return self.tableViewDidEndDisplayingHeaderViewForSectionBlock;
+}
+
+- (void)setDidEndDisplayingFooterViewForSectionBlock:(KITableViewDidEndDisplayingFooterViewForSectionBlock)block {
+    [self setTableViewDidEndDisplayingFooterViewForSectionBlock:block];
+}
+
+- (KITableViewDidEndDisplayingFooterViewForSectionBlock)didEndDisplayingFooterViewForSectionBlock {
+    return self.tableViewDidEndDisplayingFooterViewForSectionBlock;
 }
 
 @end

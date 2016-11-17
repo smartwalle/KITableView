@@ -13,11 +13,91 @@
 
 @property (nonatomic, copy) KITableViewDidSelectRowAtIndexPathBlock   tableViewDidSelectRowAtIndexPathBlock;
 @property (nonatomic, copy) KITableViewDidDeselectRowAtIndexPathBlock tableViewDidDeselectRowAtIndexPathBlock;
+
+@property (nonatomic, copy) KITableViewWillDisplayCellForRowAtIndexPathBlock      tableViewWillDisplayCellForRowAtIndexPathBlock;
+@property (nonatomic, copy) KITableViewDidEndDisplayingCellForRowAtIndexPathBlock tableViewDidEndDisplayingCellForRowAtIndexPathBlock;
+
+@property (nonatomic, copy) KITableViewWillDisplayHeaderViewForSectionBlock tableViewWillDisplayHeaderViewForSectionBlock;
+@property (nonatomic, copy) KITableViewWillDisplayFooterViewForSectionBlock tableViewWillDisplayFooterViewForSectionBlock;
+@property (nonatomic, copy) KITableViewDidEndDisplayingHeaderViewForSectionBlock tableViewDidEndDisplayingHeaderViewForSectionBlock;
+@property (nonatomic, copy) KITableViewDidEndDisplayingFooterViewForSectionBlock tableViewDidEndDisplayingFooterViewForSectionBlock;
+
 @end
 
 @implementation KITableViewAgent
 
-#pragma mark - UITableViewDataSource & UITableViewDelegate
+#pragma mark - UITableViewDelegate
+
+// Display customization
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    KISection *s = [self.dataSource objectAtIndex:indexPath.section];
+    KICell *c = [s cellAtIndex:indexPath.row];
+    KITableViewWillDisplayCellForRowAtIndexPathBlock block = [c willDisplayCellForRowAtIndexPathBlock];
+    if (block == nil) {
+        block = [self tableViewWillDisplayCellForRowAtIndexPathBlock];
+    }
+    if (block != nil) {
+        block(tableView, cell, indexPath);
+    }
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section {
+    KISection *s = [self.dataSource objectAtIndex:section];
+    KITableViewWillDisplayHeaderViewForSectionBlock block = [s willDisplayHeaderViewForSectionBlock];
+    if (block == nil) {
+        block = [self tableViewWillDisplayHeaderViewForSectionBlock];
+    }
+    if (block != nil) {
+        block(tableView, view, section);
+    }
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayFooterView:(UIView *)view forSection:(NSInteger)section {
+    KISection *s = [self.dataSource objectAtIndex:section];
+    KITableViewWillDisplayFooterViewForSectionBlock block = [s willDisplayFooterViewForSectionBlock];
+    if (block == nil) {
+        block = [self tableViewWillDisplayFooterViewForSectionBlock];
+    }
+    if (block != nil) {
+        block(tableView, view, section);
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath*)indexPath {
+    KISection *s = [self.dataSource objectAtIndex:indexPath.section];
+    KICell *c = [s cellAtIndex:indexPath.row];
+    KITableViewDidEndDisplayingCellForRowAtIndexPathBlock block = [c didEndDisplayingCellForRowAtIndexPathBlock];
+    if (block == nil) {
+        block = [self tableViewDidEndDisplayingCellForRowAtIndexPathBlock];
+    }
+    if (block != nil) {
+        block(tableView, cell, indexPath);
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didEndDisplayingHeaderView:(UIView *)view forSection:(NSInteger)section {
+    KISection *s = [self.dataSource objectAtIndex:section];
+    KITableViewDidEndDisplayingHeaderViewForSectionBlock block = [s didEndDisplayingHeaderViewForSectionBlock];
+    if (block == nil) {
+        block = [self tableViewDidEndDisplayingHeaderViewForSectionBlock];
+    }
+    if (block != nil) {
+        block(tableView, view, section);
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didEndDisplayingFooterView:(UIView *)view forSection:(NSInteger)section {
+    KISection *s = [self.dataSource objectAtIndex:section];
+    KITableViewDidEndDisplayingFooterViewForSectionBlock block = [s didEndDisplayingFooterViewForSectionBlock];
+    if (block == nil) {
+        block = [self tableViewDidEndDisplayingFooterViewForSectionBlock];
+    }
+    if (block != nil) {
+        block(tableView, view, section);
+    }
+}
+
+// Variable height support
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     KISection *s = [self.dataSource objectAtIndex:indexPath.section];
     KICell *cell = [s cellAtIndex:indexPath.row];
@@ -34,6 +114,7 @@
     return [s heightForFooter];
 }
 
+// Section header & footer information. Views are preferred over title should you decide to provide both
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     KISection *s = [self.dataSource objectAtIndex:section];
     return [s viewForHeader];
@@ -44,6 +125,7 @@
     return [s viewForFooter];
 }
 
+// Called after the user changes the selection.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     KISection *s = [self.dataSource objectAtIndex:indexPath.section];
     KICell *cell = [s cellAtIndex:indexPath.row];
@@ -82,6 +164,7 @@
     }
 }
 
+#pragma mark - UITableViewDataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     KISection *s = [self.dataSource objectAtIndex:section];
     return [[s cells] count];
@@ -259,6 +342,8 @@
 
 #pragma mark - Getters & Setters
 - (void)setTableView:(UITableView *)tableView {
+    [_tableView setDelegate:nil];
+    [_tableView setDataSource:nil];
     _tableView = tableView;
     [_tableView setDelegate:self];
     [_tableView setDataSource:self];
@@ -278,6 +363,30 @@
 
 - (void)setDidDeselectRowAtIndexPathBlock:(KITableViewDidDeselectRowAtIndexPathBlock)block {
     [self setTableViewDidDeselectRowAtIndexPathBlock:block];
+}
+
+- (void)setWillDisplayCellForRowAtIndexPathBlock:(KITableViewWillDisplayCellForRowAtIndexPathBlock)block {
+    [self setTableViewWillDisplayCellForRowAtIndexPathBlock:block];
+}
+
+- (void)setDidEndDisplayingCellForRowAtIndexPathBlock:(KITableViewDidEndDisplayingCellForRowAtIndexPathBlock)block {
+    [self setTableViewDidEndDisplayingCellForRowAtIndexPathBlock:block];
+}
+
+- (void)setWillDisplayHeaderViewForSectionBlock:(KITableViewWillDisplayHeaderViewForSectionBlock)block {
+    [self setTableViewWillDisplayHeaderViewForSectionBlock:block];
+}
+
+- (void)setWillDisplayFooterViewForSectionBlock:(KITableViewWillDisplayFooterViewForSectionBlock)block {
+    [self setTableViewWillDisplayFooterViewForSectionBlock:block];
+}
+
+- (void)setDidEndDisplayingHeaderViewForSectionBlock:(KITableViewDidEndDisplayingHeaderViewForSectionBlock)block {
+    [self setTableViewDidEndDisplayingHeaderViewForSectionBlock:block];
+}
+
+- (void)setDidEndDisplayingFooterViewForSectionBlock:(KITableViewDidEndDisplayingFooterViewForSectionBlock)block {
+    [self setTableViewDidEndDisplayingFooterViewForSectionBlock:block];
 }
 
 @end

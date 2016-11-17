@@ -10,6 +10,12 @@
 #import <UIKit/UIKit.h>
 #import "KICell.h"
 
+typedef void(^KITableViewWillDisplayHeaderViewForSectionBlock) (UITableView *tableView, UIView *headerView, NSInteger section);
+typedef void(^KITableViewWillDisplayFooterViewForSectionBlock) (UITableView *tableView, UIView *footerView, NSInteger section);
+
+typedef void(^KITableViewDidEndDisplayingHeaderViewForSectionBlock) (UITableView *tableView, UIView *headerView, NSInteger section);
+typedef void(^KITableViewDidEndDisplayingFooterViewForSectionBlock) (UITableView *tableView, UIView *footerView, NSInteger section);
+
 @interface KISection : NSObject
 
 @property (nonatomic, assign) CGFloat heightForHeader;
@@ -30,10 +36,23 @@
 
 - (void)removeCellAtIndex:(NSInteger)index;
 
+
 - (void)setDidSelectRowAtIndexPathBlock:(KITableViewDidSelectRowAtIndexPathBlock)block;
 - (KITableViewDidSelectRowAtIndexPathBlock)didSelectRowAtIndexPath;
 
 - (void)setDidDeselectRowAtIndexPathBlock:(KITableViewDidDeselectRowAtIndexPathBlock)block;
 - (KITableViewDidDeselectRowAtIndexPathBlock)didDeselectRowAtIndexPath;
+
+- (void)setWillDisplayHeaderViewForSectionBlock:(KITableViewWillDisplayHeaderViewForSectionBlock)block;
+- (KITableViewWillDisplayHeaderViewForSectionBlock)willDisplayHeaderViewForSectionBlock;
+
+- (void)setWillDisplayFooterViewForSectionBlock:(KITableViewWillDisplayFooterViewForSectionBlock)block;
+- (KITableViewWillDisplayFooterViewForSectionBlock)willDisplayFooterViewForSectionBlock;
+
+- (void)setDidEndDisplayingHeaderViewForSectionBlock:(KITableViewDidEndDisplayingHeaderViewForSectionBlock)block;
+- (KITableViewDidEndDisplayingHeaderViewForSectionBlock)didEndDisplayingHeaderViewForSectionBlock;
+
+- (void)setDidEndDisplayingFooterViewForSectionBlock:(KITableViewDidEndDisplayingFooterViewForSectionBlock)block;
+- (KITableViewDidEndDisplayingFooterViewForSectionBlock)didEndDisplayingFooterViewForSectionBlock;
 
 @end

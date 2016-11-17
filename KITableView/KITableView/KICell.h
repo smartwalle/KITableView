@@ -14,6 +14,9 @@ typedef UITableViewCell*(^KITableViewCellAtIndexPathBlock) (UITableView *tableVi
 typedef void(^KITableViewDidSelectRowAtIndexPathBlock)   (UITableView *tableView, NSIndexPath *indexPath);
 typedef void(^KITableViewDidDeselectRowAtIndexPathBlock) (UITableView *tableView, NSIndexPath *indexPath);
 
+typedef void(^KITableViewWillDisplayCellForRowAtIndexPathBlock)      (UITableView *tableView, UITableViewCell *cell, NSIndexPath *indexPath);
+typedef void(^KITableViewDidEndDisplayingCellForRowAtIndexPathBlock) (UITableView *tableView, UITableViewCell *cell, NSIndexPath *indexPath);
+
 @interface KICell : NSObject
 
 @property (nonatomic, assign) CGFloat height;
@@ -26,5 +29,11 @@ typedef void(^KITableViewDidDeselectRowAtIndexPathBlock) (UITableView *tableView
 
 - (void)setDidDeselectRowAtIndexPathBlock:(KITableViewDidDeselectRowAtIndexPathBlock)block;
 - (KITableViewDidDeselectRowAtIndexPathBlock)didDeselectRowAtIndexPath;
+
+- (void)setWillDisplayCellForRowAtIndexPathBlock:(KITableViewWillDisplayCellForRowAtIndexPathBlock)block;
+- (KITableViewWillDisplayCellForRowAtIndexPathBlock)willDisplayCellForRowAtIndexPathBlock;
+
+- (void)setDidEndDisplayingCellForRowAtIndexPathBlock:(KITableViewDidEndDisplayingCellForRowAtIndexPathBlock)block;
+- (KITableViewDidEndDisplayingCellForRowAtIndexPathBlock)didEndDisplayingCellForRowAtIndexPathBlock;
 
 @end
