@@ -6,8 +6,8 @@
 //  Copyright © 2016年 SmartWalle. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "KITableViewAction.h"
 #import "KICell.h"
 
 typedef void(^KITableViewWillDisplayHeaderViewForSectionBlock) (UITableView *tableView, UIView *headerView, NSInteger section);
@@ -36,17 +36,21 @@ typedef void(^KITableViewDidEndDisplayingFooterViewForSectionBlock) (UITableView
 
 - (void)insertCell:(KICell *)cell withIndex:(NSInteger)index;
 - (void)insertCells:(NSArray *)cells withIndex:(NSInteger)index;
+- (void)insertCells:(NSArray *)cells withIndex:(NSInteger)index withRowAnimation:(UITableViewRowAnimation)animation;
 
 - (void)deleteAllCells;
 - (void)deleteCellAtIndex:(NSInteger)index;
 - (void)deleteCellAtIndexes:(NSArray *)indexes; // indexes 为需要删除 index 的列表，如 @[@(3), @(1), @(2)]
+- (void)deleteCellAtIndexes:(NSArray *)indexes withRowAnimation:(UITableViewRowAnimation)animation;
 
 - (void)deleteCell:(KICell *)cell;
 - (void)deleteCells:(NSArray *)cells;
+- (void)deleteCells:(NSArray *)cells withRowAnimation:(UITableViewRowAnimation)animation;
 
 - (void)reloadAllCells;
 - (void)reloadCell:(KICell *)cell;
 - (void)reloadCells:(NSArray *)cells;
+- (void)reloadCells:(NSArray *)cells withRowAnimation:(UITableViewRowAnimation)animation;
 
 - (void)setDidSelectRowAtIndexPathBlock:(KITableViewDidSelectRowAtIndexPathBlock)block;
 - (KITableViewDidSelectRowAtIndexPathBlock)didSelectRowAtIndexPath;

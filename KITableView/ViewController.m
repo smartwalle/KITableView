@@ -28,7 +28,7 @@
         }
     }
     
-    [s reloadAllCells];
+    [s reloadCells:s.cells];
     
 }
 
@@ -55,6 +55,9 @@
     [s0 setHeightForHeader:44];
     
     [self.tableViewAgent insertSection:s0 withIndex:0];
+    
+    
+    NSMutableArray *cells = [[NSMutableArray alloc] init];
     for (int i=0; i<10; i++) {
         KICell *c = [[KICell alloc] init];
         [c setHeight:40];
@@ -63,16 +66,18 @@
             if (cell == nil) {
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"aaa"];
             }
-            [cell setBackgroundColor:[UIColor lightGrayColor]];
+            [cell setBackgroundColor:[UIColor whiteColor]];
             [cell.textLabel setText:[NSString stringWithFormat:@"%d", i]];
             return cell;
         }];
         [c setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
-            [weakSelf.tableViewAgent deleteCellAtIndexPath:indexPath];
+            [s0 deleteCellAtIndexes:@[@(indexPath.row)] withRowAnimation:UITableViewRowAnimationLeft];
         }];
-        [s0 appendCell:c];
+        
+        [cells addObject:c];
     }
     
+    [s0 appendCells:cells];
     
     
     KISection *s1 = [[KISection alloc] init];
@@ -85,8 +90,7 @@
     [s1 setViewForHeader:headerView];
     [s1 setHeightForHeader:44];
     
-    [self.tableViewAgent insertSection:s1 withIndex:0];
-    
+    [self.tableViewAgent insertSection:s1 withIndex:1];
     for (int i=0; i<10; i++) {
         KICell *c = [[KICell alloc] init];
         [c setHeight:40];
@@ -95,77 +99,15 @@
             if (cell == nil) {
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"aaa"];
             }
-            [cell setBackgroundColor:[UIColor lightGrayColor]];
+            [cell setBackgroundColor:[UIColor whiteColor]];
             [cell.textLabel setText:[NSString stringWithFormat:@"%d", i]];
             return cell;
         }];
         [c setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
-            [weakSelf.tableViewAgent deleteCellAtIndexPath:indexPath];
+            [weakSelf.tableViewAgent deleteSection:1 withRowAnimation:UITableViewRowAnimationFade];
         }];
-        [s1 appendCell:c];
+        [s1 insertCell:c withIndex:0];
     }
-
-//    // cell 1
-//    KICell *cell = [[KICell alloc] init];
-//    [cell setHeight:100];
-//    [cell setCellAtIndexPath:^UITableViewCell *(UITableView *tableView, NSIndexPath *indexPath) {
-//        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"aa"];
-//        if (cell == nil) {
-//            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"aa"];
-//        }
-//        [cell.textLabel setText:@"点我可以添加一个 Section"];
-//        return cell;
-//    }];
-//    [cell setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
-//        KISection *s = [[KISection alloc] init];
-//        [s setHeightForHeader:40];
-//        [s setTitleForHeader:@"我是刚刚添加的 Section Header"];
-//        [s setHeightForFooter:30];
-//        [s setTitleForFooter:@"我是刚刚添加的 Section Footer"];
-//        [weakSelf.tableViewAgent appendSecton:s];
-//        [tableView deselectRowAtIndexPath:indexPath animated:YES];
-//    }];
-//    
-//    
-//    // cell 2
-//    KICell *cell2 = [[KICell alloc] init];
-//    [cell2 setHeight:50];
-//    [cell2 setCellAtIndexPath:^UITableViewCell *(UITableView *tableView, NSIndexPath *indexPath) {
-//        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bb"];
-//        if (cell == nil) {
-//            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bb"];
-//        }
-//        [cell.textLabel setText:@"点我可以添加一些 Cell"];
-//        return cell;
-//    }];
-//    [cell2 setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
-//        NSMutableArray *cells = [[NSMutableArray alloc] init];
-//        for (int i=0; i<20; i++) {
-//            KICell *c3 = [[KICell alloc] init];
-//            [c3 setHeight:20];
-//            [c3 setCellAtIndexPath:^UITableViewCell *(UITableView *tableView, NSIndexPath *indexPath) {
-//                UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"dd"];
-//                if (cell == nil) {
-//                    cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"dd"];
-//                }
-//                [cell.textLabel setText:[NSString stringWithFormat:@"我是刚刚添加的 Cell %d", i]];
-//                return cell;
-//            }];
-//            [c3 setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
-//                [weakSelf.tableViewAgent deleteCellsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-//            }];
-//            [cells addObject:c3];
-//        }
-//        
-//        [weakSelf.tableViewAgent insertCells:cells
-//                               withIndexPath:[NSIndexPath indexPathForRow:0 inSection:1]
-//                            withRowAnimation:UITableViewRowAnimationFade];
-//        [tableView deselectRowAtIndexPath:indexPath animated:YES];
-//    }];
-//    
-//    
-//    [self.tableViewAgent appendCell:cell];
-//    [self.tableViewAgent appendCell:cell2];
 }
 
 - (void)didReceiveMemoryWarning {

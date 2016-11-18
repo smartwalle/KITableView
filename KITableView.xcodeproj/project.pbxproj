@@ -16,6 +16,7 @@
 		18022B571D66D340008540DB /* KISection.m in Sources */ = {isa = PBXBuildFile; fileRef = 18022B561D66D340008540DB /* KISection.m */; };
 		18022B5A1D66D34B008540DB /* KICell.m in Sources */ = {isa = PBXBuildFile; fileRef = 18022B591D66D34B008540DB /* KICell.m */; };
 		18022B5D1D66D4B6008540DB /* KITableViewAgent.m in Sources */ = {isa = PBXBuildFile; fileRef = 18022B5C1D66D4B6008540DB /* KITableViewAgent.m */; };
+		1852B5951DDEC2C300212A27 /* KITableViewAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 1852B5941DDEC2C300212A27 /* KITableViewAction.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,8 @@
 		18022B591D66D34B008540DB /* KICell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KICell.m; sourceTree = "<group>"; };
 		18022B5B1D66D4B6008540DB /* KITableViewAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KITableViewAgent.h; sourceTree = "<group>"; };
 		18022B5C1D66D4B6008540DB /* KITableViewAgent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KITableViewAgent.m; sourceTree = "<group>"; };
+		1852B5931DDEC2C300212A27 /* KITableViewAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KITableViewAction.h; sourceTree = "<group>"; };
+		1852B5941DDEC2C300212A27 /* KITableViewAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KITableViewAction.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +101,8 @@
 				18022B561D66D340008540DB /* KISection.m */,
 				18022B581D66D34B008540DB /* KICell.h */,
 				18022B591D66D34B008540DB /* KICell.m */,
+				1852B5931DDEC2C300212A27 /* KITableViewAction.h */,
+				1852B5941DDEC2C300212A27 /* KITableViewAction.m */,
 			);
 			path = KITableView;
 			sourceTree = "<group>";
@@ -174,6 +179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				18022B571D66D340008540DB /* KISection.m in Sources */,
+				1852B5951DDEC2C300212A27 /* KITableViewAction.m in Sources */,
 				18022B5D1D66D4B6008540DB /* KITableViewAgent.m in Sources */,
 				18022B421D66D0B4008540DB /* ViewController.m in Sources */,
 				18022B3F1D66D0B4008540DB /* AppDelegate.m in Sources */,

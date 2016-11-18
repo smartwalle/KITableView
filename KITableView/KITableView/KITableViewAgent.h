@@ -51,6 +51,7 @@
 
 - (void)deleteAllSection;
 - (void)deleteSection:(NSInteger)section;
+- (void)deleteSection:(NSInteger)section withRowAnimation:(UITableViewRowAnimation)animation;
 - (void)deleteSections:(NSIndexSet *)sections;
 - (void)deleteSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation;
 
