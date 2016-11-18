@@ -17,12 +17,9 @@
 
 - (KISection *)sectionAtIndex:(NSInteger)index;
 
-- (void)appendSecton:(KISection *)section;
-
-- (void)insertSection:(KISection *)section withIndex:(NSInteger)index;
-- (void)insertSection:(KISection *)section withIndex:(NSInteger)index withRowAnimation:(UITableViewRowAnimation)animation;
-
+// 添加 Cell
 - (void)appendCell:(KICell *)cell;
+
 - (void)insertCell:(KICell *)cell withIndexPath:(NSIndexPath *)indexPath;
 - (void)insertCell:(KICell *)cell withIndexPath:(NSIndexPath *)indexPath withRowAnimation:(UITableViewRowAnimation)animation;
 
@@ -34,7 +31,33 @@
 - (void)appendCells:(NSArray *)cells withSection:(NSInteger)section withRowAnimation:(UITableViewRowAnimation)animation;
 - (void)insertCells:(NSArray *)cells withIndexPath:(NSIndexPath *)indexPath withRowAnimation:(UITableViewRowAnimation)animation;
 
+// 删除 Cell
+- (void)deleteCellAtIndexPath:(NSIndexPath *)indexPath;
 - (void)deleteCellsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation;
+
+// 重新加载 Cell
+- (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths;
+- (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation;
+
+// 添加 Section
+- (void)appendSecton:(KISection *)section;
+
+- (void)insertSection:(KISection *)section withIndex:(NSInteger)index;
+- (void)insertSection:(KISection *)section withIndex:(NSInteger)index withRowAnimation:(UITableViewRowAnimation)animation;
+
+// 删除 Section
+- (void)removeSection:(KISection *)section;
+- (void)removeSection:(KISection *)section withRowAnimation:(UITableViewRowAnimation)animation;
+
+- (void)deleteAllSection;
+- (void)deleteSection:(NSInteger)section;
+- (void)deleteSections:(NSIndexSet *)sections;
+- (void)deleteSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation;
+
+// 重新加载 Section
+- (void)reloadSection:(KISection *)section;
+- (void)reloadSections:(NSIndexSet *)sections;
+- (void)reloadSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation;
 
 
 - (void)setDidSelectRowAtIndexPathBlock:(KITableViewDidSelectRowAtIndexPathBlock)block;

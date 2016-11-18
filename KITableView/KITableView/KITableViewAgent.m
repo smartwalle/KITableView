@@ -26,11 +26,99 @@
 
 @implementation KITableViewAgent
 
+#pragma mark - Lifecycle
+- (void)dealloc {
+    [self removeObserver:self forKeyPath:@"dataSource"];
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        [self addObserver:self forKeyPath:@"dataSource" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+    }
+    return self;
+}
+
+#pragma mark - KVO
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([object isKindOfClass:[KISection class]]) {
+        NSInteger section = [self.dataSource indexOfObject:object];
+        
+        if ([keyPath isEqualToString:@"cellList"]) {
+            NSNumber *kind = change[NSKeyValueChangeKindKey];
+            NSIndexSet *indexes = change[NSKeyValueChangeIndexesKey];
+            
+            switch (kind.integerValue) {
+                case NSKeyValueChangeSetting:
+                    break;
+                case NSKeyValueChangeInsertion: {
+                    [self.tableView beginUpdates];
+                    NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+                    for (NSInteger i=indexes.firstIndex; i<= indexes.lastIndex; i++) {
+                        NSIndexPath *temp = [NSIndexPath indexPathForRow:i inSection:section];
+                        [indexPaths addObject:temp];
+                    }
+                    [self.tableView insertRowsAtIndexPaths:indexPaths
+                                          withRowAnimation:UITableViewRowAnimationFade];
+                    [self.tableView endUpdates];
+                }
+                    break;
+                case NSKeyValueChangeRemoval: {
+                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:indexes.firstIndex inSection:section];
+                    [self.tableView beginUpdates];
+                    [self.tableView deleteRowsAtIndexPaths:@[indexPath]
+                                          withRowAnimation:UITableViewRowAnimationFade];
+                    [self.tableView endUpdates];
+                }
+                    break;
+                case NSKeyValueChangeReplacement: {
+                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:indexes.firstIndex inSection:section];
+                    [self.tableView beginUpdates];
+                    [self.tableView reloadRowsAtIndexPaths:@[indexPath]
+                                          withRowAnimation:UITableViewRowAnimationFade];
+                    [self.tableView endUpdates];
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+    } else if (object == self) {
+        if ([keyPath isEqualToString:@"dataSource"]) {
+            NSNumber *kind = change[NSKeyValueChangeKindKey];
+            NSIndexSet *indexes = change[NSKeyValueChangeIndexesKey];
+            
+            switch (kind.integerValue) {
+                case NSKeyValueChangeSetting:
+                    break;
+                case NSKeyValueChangeInsertion: {
+                    [self.tableView beginUpdates];
+                    [self.tableView insertSections:indexes
+                                  withRowAnimation:UITableViewRowAnimationFade];
+                    [self.tableView endUpdates];
+                }
+                    break;
+                case NSKeyValueChangeRemoval: {
+                    [self.tableView beginUpdates];
+                    [self.tableView deleteSections:indexes
+                                  withRowAnimation:UITableViewRowAnimationFade];
+                    [self.tableView endUpdates];
+                }
+                    break;
+                case NSKeyValueChangeReplacement:
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+
 #pragma mark - UITableViewDelegate
 
 // Display customization
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    KISection *s = [self.dataSource objectAtIndex:indexPath.section];
+    KISection *s = [self sectionAtIndex:indexPath.section];
     KICell *c = [s cellAtIndex:indexPath.row];
     KITableViewWillDisplayCellForRowAtIndexPathBlock block = [c willDisplayCellForRowAtIndexPathBlock];
     if (block == nil) {
@@ -42,7 +130,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     KITableViewWillDisplayHeaderViewForSectionBlock block = [s willDisplayHeaderViewForSectionBlock];
     if (block == nil) {
         block = [self tableViewWillDisplayHeaderViewForSectionBlock];
@@ -53,7 +141,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayFooterView:(UIView *)view forSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     KITableViewWillDisplayFooterViewForSectionBlock block = [s willDisplayFooterViewForSectionBlock];
     if (block == nil) {
         block = [self tableViewWillDisplayFooterViewForSectionBlock];
@@ -64,7 +152,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath*)indexPath {
-    KISection *s = [self.dataSource objectAtIndex:indexPath.section];
+    KISection *s = [self sectionAtIndex:indexPath.section];
     KICell *c = [s cellAtIndex:indexPath.row];
     KITableViewDidEndDisplayingCellForRowAtIndexPathBlock block = [c didEndDisplayingCellForRowAtIndexPathBlock];
     if (block == nil) {
@@ -76,7 +164,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didEndDisplayingHeaderView:(UIView *)view forSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     KITableViewDidEndDisplayingHeaderViewForSectionBlock block = [s didEndDisplayingHeaderViewForSectionBlock];
     if (block == nil) {
         block = [self tableViewDidEndDisplayingHeaderViewForSectionBlock];
@@ -87,7 +175,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didEndDisplayingFooterView:(UIView *)view forSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     KITableViewDidEndDisplayingFooterViewForSectionBlock block = [s didEndDisplayingFooterViewForSectionBlock];
     if (block == nil) {
         block = [self tableViewDidEndDisplayingFooterViewForSectionBlock];
@@ -99,35 +187,35 @@
 
 // Variable height support
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    KISection *s = [self.dataSource objectAtIndex:indexPath.section];
+    KISection *s = [self sectionAtIndex:indexPath.section];
     KICell *cell = [s cellAtIndex:indexPath.row];
     return [cell height];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     return [s heightForHeader];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     return [s heightForFooter];
 }
 
 // Section header & footer information. Views are preferred over title should you decide to provide both
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     return [s viewForHeader];
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     return [s viewForFooter];
 }
 
 // Called after the user changes the selection.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    KISection *s = [self.dataSource objectAtIndex:indexPath.section];
+    KISection *s = [self sectionAtIndex:indexPath.section];
     KICell *cell = [s cellAtIndex:indexPath.row];
     
     KITableViewDidSelectRowAtIndexPathBlock block = [cell didSelectRowAtIndexPath];
@@ -146,7 +234,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-    KISection *s = [self.dataSource objectAtIndex:indexPath.section];
+    KISection *s = [self sectionAtIndex:indexPath.section];
     KICell *cell = [s cellAtIndex:indexPath.row];
     
     KITableViewDidSelectRowAtIndexPathBlock block = [cell didDeselectRowAtIndexPath];
@@ -166,7 +254,7 @@
 
 #pragma mark - UITableViewDataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     return [[s cells] count];
 }
 
@@ -185,16 +273,20 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     return [s titleForHeader];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    KISection *s = [self.dataSource objectAtIndex:section];
+    KISection *s = [self sectionAtIndex:section];
     return [s titleForFooter];
 }
 
-#pragma mark - Methods 
+#pragma mark - Methods
+- (NSMutableArray *)dataSourceWrapper {
+    return [self mutableArrayValueForKey:@"dataSource"];
+}
+
 - (KICell *)cellAtIndexPath:(NSIndexPath *)indexPath {
     KISection *s = [self sectionAtIndex:indexPath.section];
     KICell *cell = [[s cells] objectAtIndex:indexPath.row];
@@ -208,27 +300,6 @@
     KISection *s = [self.dataSource objectAtIndex:index];
     return s;
 }
-
-- (void)appendSecton:(KISection *)section {
-    NSInteger index = self.dataSource.count;
-    [self insertSection:section withIndex:index];
-}
-
-- (void)insertSection:(KISection *)section withIndex:(NSInteger)index {
-    [self insertSection:section withIndex:index withRowAnimation:UITableViewRowAnimationNone];
-}
-
-- (void)insertSection:(KISection *)section withIndex:(NSInteger)index withRowAnimation:(UITableViewRowAnimation)animation {
-    if (section == nil) {
-        return ;
-    }
-    [self.dataSource insertObject:section atIndex:index];
-    [self.tableView beginUpdates];
-    [self.tableView insertSections:[NSIndexSet indexSetWithIndex:index]
-                  withRowAnimation:animation];
-    [self.tableView endUpdates];
-}
-
 
 - (void)appendCell:(KICell *)cell {
     NSInteger section = self.dataSource.count - 1;
@@ -286,33 +357,21 @@
     if (cells == nil || cells.count == 0 || indexPath == nil) {
         return;
     }
-    
-    BOOL sectionExists = YES;
-    
     NSInteger section = indexPath.section;
     KISection *s = [self sectionAtIndex:section];
     if (s == nil) {
         s = [[KISection alloc] init];
-        [self.dataSource addObject:s];
-        sectionExists = NO;
+        [s addObserver:self forKeyPath:@"cellList" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+        [[self dataSourceWrapper] addObject:s];
     }
-    
     [s insertCells:cells withIndex:indexPath.row];
-    
-    [self.tableView beginUpdates];
-    if (sectionExists) {
-        NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
-        for (int i=0; i<cells.count; i++) {
-            NSIndexPath *temp = [NSIndexPath indexPathForRow:i+indexPath.row inSection:section];
-            [indexPaths addObject:temp];
-        }
-        [self.tableView insertRowsAtIndexPaths:indexPaths
-                              withRowAnimation:animation];
-    } else {
-        [self.tableView insertSections:[NSIndexSet indexSetWithIndex:section]
-                      withRowAnimation:animation];
+}
+
+- (void)deleteCellAtIndexPath:(NSIndexPath *)indexPath {
+    KISection *s = [self sectionAtIndex:indexPath.section];
+    if (s != nil) {
+        [s deleteCellAtIndex:indexPath.row];
     }
-    [self.tableView endUpdates];
 }
 
 - (void)deleteCellsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
@@ -329,14 +388,100 @@
     }];
     
     for (NSIndexPath *indexPath in newIndexPaths) {
-        KISection *s = [self.dataSource objectAtIndex:indexPath.section];
+        KISection *s = [self sectionAtIndex:indexPath.section];
         if (s != nil) {
-            [s removeCellAtIndex:indexPath.row];
+            [s deleteCellAtIndex:indexPath.row];
         }
     }
-    
+}
+
+- (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths {
     [self.tableView beginUpdates];
-    [self.tableView deleteRowsAtIndexPaths:newIndexPaths withRowAnimation:animation];
+    [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    [self.tableView endUpdates];
+}
+
+- (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
+    [self.tableView beginUpdates];
+    [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:animation];
+    [self.tableView endUpdates];
+}
+
+- (void)appendSecton:(KISection *)section {
+    NSInteger index = self.dataSource.count;
+    [self insertSection:section withIndex:index];
+}
+
+- (void)insertSection:(KISection *)section withIndex:(NSInteger)index {
+    [self insertSection:section withIndex:index withRowAnimation:UITableViewRowAnimationNone];
+}
+
+- (void)insertSection:(KISection *)section withIndex:(NSInteger)index withRowAnimation:(UITableViewRowAnimation)animation {
+    if (section == nil) {
+        return ;
+    }
+    if ([self.dataSource containsObject:section]) {
+        return ;
+    }
+    
+    [section addObserver:self forKeyPath:@"cellList" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+    [[self dataSourceWrapper] insertObject:section atIndex:index];
+}
+
+- (void)removeSection:(KISection *)section {
+    [self removeSection:section withRowAnimation:UITableViewRowAnimationFade];
+}
+
+- (void)removeSection:(KISection *)section withRowAnimation:(UITableViewRowAnimation)animation {
+    if (section != nil) {
+        if ([self.dataSource containsObject:section]) {
+            [section removeObserver:self forKeyPath:@"cellList"];
+            [[self dataSourceWrapper] removeObject:section];
+        }
+    }
+}
+
+- (void)deleteAllSection {
+    for (KISection *s in self.dataSource) {
+        [s removeObserver:self forKeyPath:@"cellList"];
+    }
+    [[self dataSourceWrapper] removeAllObjects];
+}
+
+- (void)deleteSection:(NSInteger)section {
+    if (self.dataSource.count <= section) {
+        return;
+    }
+    [self deleteSections:[NSIndexSet indexSetWithIndex:section]];
+}
+
+- (void)deleteSections:(NSIndexSet *)sections {
+    [self deleteSections:sections withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
+- (void)deleteSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation {
+    for (NSInteger i=sections.firstIndex; i<=sections.lastIndex; i++) {
+        KISection *s = [self sectionAtIndex:i];
+        if (s != nil) {
+            [s removeObserver:self forKeyPath:@"cellList"];
+        }
+    }
+    [[self dataSourceWrapper] removeObjectsAtIndexes:sections];
+}
+
+- (void)reloadSection:(KISection *)section {
+    NSUInteger index = [self.dataSource indexOfObject:section];
+    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
+    [self reloadSections:indexSet];
+}
+
+- (void)reloadSections:(NSIndexSet *)sections {
+    [self reloadSections:sections withRowAnimation:UITableViewRowAnimationFade];
+}
+
+- (void)reloadSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation {
+    [self.tableView beginUpdates];
+    [self.tableView reloadSections:sections withRowAnimation:animation];
     [self.tableView endUpdates];
 }
 

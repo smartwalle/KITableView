@@ -18,17 +18,62 @@
 @implementation ViewController
 
 - (void)haha:(UIButton *)sender {
-    NSLog(@"aa");
+    
+    KISection *s = [self.tableViewAgent sectionAtIndex:0];
+    for (KICell *c in s.cells) {
+        if (c.height == 0) {
+            [c setHeight:40];
+        } else {
+            [c setHeight:0];
+        }
+    }
+    
+    [s reloadAllCells];
+    
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
     self.tableView = (UITableView *)[self.view viewWithTag:1001];
+    [self.tableView setTableFooterView:[UIView new]];
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     
     self.tableViewAgent = [[KITableViewAgent alloc] init];
     [self.tableViewAgent setTableView:self.tableView];
     
     __weak ViewController *weakSelf = self;
+    
+    KISection *s0 = [[KISection alloc] init];
+    UIView *headerView0 = [[UIView alloc] init];
+    UIButton *btn0 = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btn0 setBackgroundColor:[UIColor greenColor]];
+    [btn0 setFrame:CGRectMake(0, 0, 320, 44)];
+    [btn0 addTarget:self action:@selector(haha:) forControlEvents:UIControlEventTouchUpInside];
+    [headerView0 addSubview:btn0];
+    [s0 setViewForHeader:headerView0];
+    [s0 setHeightForHeader:44];
+    
+    [self.tableViewAgent insertSection:s0 withIndex:0];
+    for (int i=0; i<10; i++) {
+        KICell *c = [[KICell alloc] init];
+        [c setHeight:40];
+        [c setCellAtIndexPath:^UITableViewCell *(UITableView *tableView, NSIndexPath *indexPath) {
+            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"aaa"];
+            if (cell == nil) {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"aaa"];
+            }
+            [cell setBackgroundColor:[UIColor lightGrayColor]];
+            [cell.textLabel setText:[NSString stringWithFormat:@"%d", i]];
+            return cell;
+        }];
+        [c setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
+            [weakSelf.tableViewAgent deleteCellAtIndexPath:indexPath];
+        }];
+        [s0 appendCell:c];
+    }
+    
+    
     
     KISection *s1 = [[KISection alloc] init];
     UIView *headerView = [[UIView alloc] init];
@@ -40,6 +85,8 @@
     [s1 setViewForHeader:headerView];
     [s1 setHeightForHeader:44];
     
+    [self.tableViewAgent insertSection:s1 withIndex:0];
+    
     for (int i=0; i<10; i++) {
         KICell *c = [[KICell alloc] init];
         [c setHeight:40];
@@ -48,15 +95,16 @@
             if (cell == nil) {
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"aaa"];
             }
+            [cell setBackgroundColor:[UIColor lightGrayColor]];
             [cell.textLabel setText:[NSString stringWithFormat:@"%d", i]];
             return cell;
         }];
-        [s1 insertCell:c withIndex:0];
+        [c setDidSelectRowAtIndexPathBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
+            [weakSelf.tableViewAgent deleteCellAtIndexPath:indexPath];
+        }];
+        [s1 appendCell:c];
     }
-    
-    [self.tableViewAgent appendSecton:s1];
-    
-    
+
 //    // cell 1
 //    KICell *cell = [[KICell alloc] init];
 //    [cell setHeight:100];
@@ -118,8 +166,6 @@
 //    
 //    [self.tableViewAgent appendCell:cell];
 //    [self.tableViewAgent appendCell:cell2];
-//    
-//    [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {

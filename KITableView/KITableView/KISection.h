@@ -31,11 +31,22 @@ typedef void(^KITableViewDidEndDisplayingFooterViewForSectionBlock) (UITableView
 
 - (KICell *)cellAtIndex:(NSInteger)index;
 
+- (void)appendCell:(KICell *)cell;
+- (void)appendCells:(NSArray *)cells;
+
 - (void)insertCell:(KICell *)cell withIndex:(NSInteger)index;
 - (void)insertCells:(NSArray *)cells withIndex:(NSInteger)index;
 
-- (void)removeCellAtIndex:(NSInteger)index;
+- (void)deleteAllCells;
+- (void)deleteCellAtIndex:(NSInteger)index;
+- (void)deleteCellAtIndexes:(NSArray *)indexes; // indexes 为需要删除 index 的列表，如 @[@(3), @(1), @(2)]
 
+- (void)deleteCell:(KICell *)cell;
+- (void)deleteCells:(NSArray *)cells;
+
+- (void)reloadAllCells;
+- (void)reloadCell:(KICell *)cell;
+- (void)reloadCells:(NSArray *)cells;
 
 - (void)setDidSelectRowAtIndexPathBlock:(KITableViewDidSelectRowAtIndexPathBlock)block;
 - (KITableViewDidSelectRowAtIndexPathBlock)didSelectRowAtIndexPath;
