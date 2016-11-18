@@ -19,17 +19,16 @@
 
 - (void)haha:(UIButton *)sender {
     
-    KISection *s = [self.tableViewAgent sectionAtIndex:0];
+    KISection *s = [self.tableViewAgent sectionAtIndex:sender.tag];
     for (KICell *c in s.cells) {
         if (c.height == 0) {
             [c setHeight:40];
+            
         } else {
             [c setHeight:0];
         }
     }
-    
     [s reloadCells:s.cells];
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -37,7 +36,6 @@
     
     self.tableView = (UITableView *)[self.view viewWithTag:1001];
     [self.tableView setTableFooterView:[UIView new]];
-    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     
     self.tableViewAgent = [[KITableViewAgent alloc] init];
     [self.tableViewAgent setTableView:self.tableView];
@@ -49,6 +47,7 @@
     UIButton *btn0 = [UIButton buttonWithType:UIButtonTypeCustom];
     [btn0 setBackgroundColor:[UIColor greenColor]];
     [btn0 setFrame:CGRectMake(0, 0, 320, 44)];
+    [btn0 setTag:0];
     [btn0 addTarget:self action:@selector(haha:) forControlEvents:UIControlEventTouchUpInside];
     [headerView0 addSubview:btn0];
     [s0 setViewForHeader:headerView0];
@@ -58,7 +57,7 @@
     
     
     NSMutableArray *cells = [[NSMutableArray alloc] init];
-    for (int i=0; i<10; i++) {
+    for (int i=0; i<20; i++) {
         KICell *c = [[KICell alloc] init];
         [c setHeight:40];
         [c setCellAtIndexPath:^UITableViewCell *(UITableView *tableView, NSIndexPath *indexPath) {
@@ -84,6 +83,7 @@
     UIView *headerView = [[UIView alloc] init];
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
     [btn setBackgroundColor:[UIColor greenColor]];
+    [btn setTag:1];
     [btn setFrame:CGRectMake(0, 0, 320, 44)];
     [btn addTarget:self action:@selector(haha:) forControlEvents:UIControlEventTouchUpInside];
     [headerView addSubview:btn];
@@ -91,7 +91,7 @@
     [s1 setHeightForHeader:44];
     
     [self.tableViewAgent insertSection:s1 withIndex:1];
-    for (int i=0; i<10; i++) {
+    for (int i=0; i<20; i++) {
         KICell *c = [[KICell alloc] init];
         [c setHeight:40];
         [c setCellAtIndexPath:^UITableViewCell *(UITableView *tableView, NSIndexPath *indexPath) {
