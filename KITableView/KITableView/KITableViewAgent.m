@@ -419,14 +419,8 @@
 - (void)removeSection:(KISection *)section withRowAnimation:(UITableViewRowAnimation)animation {
     if (section != nil) {
         if ([self.dataSource containsObject:section]) {
-            [section removeObserver:self forKeyPath:@"action"];
-            [self.dataSource removeObject:section];
-            
             NSInteger index = [self.dataSource indexOfObject:section];
-            
-            [self.tableView beginUpdates];
-            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:index] withRowAnimation:animation];
-            [self.tableView endUpdates];
+            [self deleteSections:[NSIndexSet indexSetWithIndex:index] withRowAnimation:animation];
         }
     }
 }
