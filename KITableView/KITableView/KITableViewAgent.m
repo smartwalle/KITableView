@@ -9,7 +9,7 @@
 #import "KITableViewAgent.h"
 #import "KISection.h"
 
-@interface KITableViewAgent ()
+@interface KITableViewAgent () <KISectionDelegate>
 @property (nonatomic, strong) NSMutableArray *dataSource;
 
 @property (nonatomic, copy) KITableViewDidSelectRowAtIndexPathBlock   tableViewDidSelectRowAtIndexPathBlock;
@@ -29,66 +29,50 @@
 
 #pragma mark - Lifecycle
 
-#pragma mark - KVO
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if ([object isKindOfClass:[KISection class]]) {
-        NSInteger section = [self.dataSource indexOfObject:object];
-        if ([keyPath isEqualToString:@"action"]) {
-            NSNumber *kind = change[NSKeyValueChangeKindKey];
-            KITableViewAction *action = [change objectForKey:NSKeyValueChangeNewKey];
-            
-            switch (kind.integerValue) {
-                case NSKeyValueChangeSetting: {
-                    
-                    switch (action.type) {
-                        case KITableViewActionTypeOfInsertion: {
-                            [self.tableView beginUpdates];
-                            NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
-                            for (NSNumber *index in action.indexes) {
-                                NSIndexPath *temp = [NSIndexPath indexPathForRow:[index integerValue] inSection:section];
-                                [indexPaths addObject:temp];
-                            }
-                            [self.tableView insertRowsAtIndexPaths:indexPaths
-                                                  withRowAnimation:action.animation];
-                            [self.tableView endUpdates];
-                        }
-                            break;
-                        case KITableViewActionTypeOfRemoval: {
-                            NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
-                            for (NSNumber *index in action.indexes) {
-                                NSIndexPath *temp = [NSIndexPath indexPathForRow:[index integerValue] inSection:section];
-                                [indexPaths addObject:temp];
-                            }
-                            [self.tableView beginUpdates];
-                            [self.tableView deleteRowsAtIndexPaths:indexPaths
-                                                  withRowAnimation:action.animation];
-                            [self.tableView endUpdates];
-                        }
-                            break;
-                        case KITableViewActionTypeOfReplacement: {
-                            NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
-                            for (NSNumber *index in action.indexes) {
-                                NSIndexPath *temp = [NSIndexPath indexPathForRow:[index integerValue] inSection:section];
-                                [indexPaths addObject:temp];
-                            }
-                            [self.tableView beginUpdates];
-                            [self.tableView reloadRowsAtIndexPaths:indexPaths
-                                                  withRowAnimation:action.animation];
-                            [self.tableView endUpdates];
-                        }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                    break;
-                default:
-                    break;
+#pragma mark - KISectionDelegate
+- (void)section:(KISection *)section didUpdateRowsAtIndexes:(NSArray *)indexes type:(KISecionActionType)type animation:(UITableViewRowAnimation)animation {
+    NSInteger sectionIndex = [self.dataSource indexOfObject:section];
+    switch (type) {
+        case KISecionActionTypeOfInsertRows: {
+            [self.tableView beginUpdates];
+            NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+            for (NSNumber *index in indexes) {
+                NSIndexPath *temp = [NSIndexPath indexPathForRow:[index integerValue] inSection:sectionIndex];
+                [indexPaths addObject:temp];
             }
+            [self.tableView insertRowsAtIndexPaths:indexPaths
+                                  withRowAnimation:animation];
+            [self.tableView endUpdates];
         }
+            break;
+        case KISecionActionTypeOfDeleteRows: {
+            NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+            for (NSNumber *index in indexes) {
+                NSIndexPath *temp = [NSIndexPath indexPathForRow:[index integerValue] inSection:sectionIndex];
+                [indexPaths addObject:temp];
+            }
+            [self.tableView beginUpdates];
+            [self.tableView deleteRowsAtIndexPaths:indexPaths
+                                  withRowAnimation:animation];
+            [self.tableView endUpdates];
+        }
+            break;
+        case KISecionActionTypeOfReloadRows: {
+            NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+            for (NSNumber *index in indexes) {
+                NSIndexPath *temp = [NSIndexPath indexPathForRow:[index integerValue] inSection:sectionIndex];
+                [indexPaths addObject:temp];
+            }
+            [self.tableView beginUpdates];
+            [self.tableView reloadRowsAtIndexPaths:indexPaths
+                                  withRowAnimation:animation];
+            [self.tableView endUpdates];
+        }
+            break;
+        default:
+            break;
     }
 }
-
 
 #pragma mark - UITableViewDelegate
 
@@ -404,7 +388,8 @@
         return ;
     }
     
-    [section addObserver:self forKeyPath:@"action" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+    [section setDelegate:self];
+    
     [self.dataSource insertObject:section atIndex:index];
     
     [self.tableView beginUpdates];
@@ -426,9 +411,6 @@
 }
 
 - (void)deleteAllSection {
-    for (KISection *s in self.dataSource) {
-        [s removeObserver:self forKeyPath:@"action"];
-    }
     [self.dataSource removeAllObjects];
     [self.tableView reloadData];
 }
@@ -452,12 +434,6 @@
 }
 
 - (void)deleteSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation {
-    for (NSInteger i=sections.firstIndex; i<=sections.lastIndex; i++) {
-        KISection *s = [self sectionAtIndex:i];
-        if (s != nil) {
-            [s removeObserver:self forKeyPath:@"action"];
-        }
-    }
     [self.dataSource removeObjectsAtIndexes:sections];
     
     [self.tableView beginUpdates];

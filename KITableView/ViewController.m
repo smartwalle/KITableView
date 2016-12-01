@@ -18,7 +18,6 @@
 @implementation ViewController
 
 - (void)haha:(UIButton *)sender {
-    
     KISection *s = [self.tableViewAgent sectionAtIndex:sender.tag];
     for (KICell *c in s.cells) {
         if (c.height == 0) {

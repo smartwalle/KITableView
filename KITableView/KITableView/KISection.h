@@ -7,8 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "KITableViewAction.h"
 #import "KICell.h"
+
+typedef NS_ENUM(NSInteger, KISecionActionType) {
+    KISecionActionTypeOfInsertRows = 0x01,
+    KISecionActionTypeOfDeleteRows = 0x02,
+    KISecionActionTypeOfReloadRows = 0x03
+};
 
 typedef void(^KITableViewWillDisplayHeaderViewForSectionBlock) (UITableView *tableView, UIView *headerView, NSInteger section);
 typedef void(^KITableViewWillDisplayFooterViewForSectionBlock) (UITableView *tableView, UIView *footerView, NSInteger section);
@@ -16,7 +21,14 @@ typedef void(^KITableViewWillDisplayFooterViewForSectionBlock) (UITableView *tab
 typedef void(^KITableViewDidEndDisplayingHeaderViewForSectionBlock) (UITableView *tableView, UIView *headerView, NSInteger section);
 typedef void(^KITableViewDidEndDisplayingFooterViewForSectionBlock) (UITableView *tableView, UIView *footerView, NSInteger section);
 
+@class KISection;
+@protocol KISectionDelegate <NSObject>
+- (void)section:(KISection *)section didUpdateRowsAtIndexes:(NSArray *)indexes type:(KISecionActionType)type animation:(UITableViewRowAnimation)animation;
+@end
+
 @interface KISection : NSObject
+
+@property (nonatomic, weak) id<KISectionDelegate> delegate;
 
 @property (nonatomic, assign) CGFloat heightForHeader;
 @property (nonatomic, assign) CGFloat heightForFooter;

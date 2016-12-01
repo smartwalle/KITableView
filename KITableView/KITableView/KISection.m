@@ -10,8 +10,6 @@
 
 @interface KISection ()
 
-@property (nonatomic, strong) KITableViewAction *action;
-
 @property (nonatomic, strong) NSMutableArray *cellList;
 
 @property (nonatomic, copy) KITableViewDidSelectRowAtIndexPathBlock   tableViewDidSelectRowAtIndexPathBlock;
@@ -26,14 +24,11 @@
 @implementation KISection
 
 #pragma mark - Methods
-- (void)postAction:(KITableViewActionType)type indexes:(NSArray *)indexes animation:(UITableViewRowAnimation)animation {
-    KITableViewAction *action = [[KITableViewAction alloc] init];
-    [action setType:type];
-    [action setAnimation:animation];
-    action.indexes = indexes;
-    [self setAction:action];
+- (void)postAction:(KISecionActionType)type indexes:(NSArray *)indexes animation:(UITableViewRowAnimation)animation {
+    if (self.delegate != nil && [self.delegate respondsToSelector:@selector(section:didUpdateRowsAtIndexes:type:animation:)]) {
+        [self.delegate section:self didUpdateRowsAtIndexes:indexes type:type animation:animation];
+    }
 }
-
 
 - (void)appendCell:(KICell *)cell {
     [self appendCells:@[cell]];}
@@ -45,7 +40,7 @@
     for (NSInteger i=self.cellList.count-cells.count; i<self.cellList.count; i++) {
         [indexes addObject:@(i)];
     }
-    [self postAction:KITableViewActionTypeOfInsertion indexes:indexes animation:UITableViewRowAnimationAutomatic];
+    [self postAction:KISecionActionTypeOfInsertRows indexes:indexes animation:UITableViewRowAnimationAutomatic];
 }
 
 - (void)insertCell:(KICell *)cell withIndex:(NSInteger)index {
@@ -53,7 +48,7 @@
     
     NSMutableArray *indexes = [[NSMutableArray alloc] init];
     [indexes addObject:@(index)];
-    [self postAction:KITableViewActionTypeOfInsertion indexes:indexes animation:UITableViewRowAnimationAutomatic];
+    [self postAction:KISecionActionTypeOfInsertRows indexes:indexes animation:UITableViewRowAnimationAutomatic];
 }
 
 - (void)insertCells:(NSArray *)cells withIndex:(NSInteger)index {
@@ -70,7 +65,7 @@
     for (int i=index; i<count; i++) {
         [indexes addObject:@(i)];
     }
-    [self postAction:KITableViewActionTypeOfInsertion indexes:indexes animation:animation];
+    [self postAction:KISecionActionTypeOfInsertRows indexes:indexes animation:animation];
 }
 
 - (void)deleteAllCells {
@@ -109,7 +104,7 @@
             [self.cellList removeObjectAtIndex:index];
         }
     }
-    [self postAction:KITableViewActionTypeOfRemoval indexes:newIndexes animation:animation];
+    [self postAction:KISecionActionTypeOfDeleteRows indexes:newIndexes animation:animation];
 }
 
 - (void)deleteCell:(KICell *)cell {
@@ -128,7 +123,7 @@
         }
     }
     [self.cellList removeObjectsInArray:cells];
-    [self postAction:KITableViewActionTypeOfRemoval indexes:indexes animation:animation];
+    [self postAction:KISecionActionTypeOfDeleteRows indexes:indexes animation:animation];
 }
 
 - (void)reloadAllCells {
@@ -150,7 +145,7 @@
             [indexes addObject:@([self.cellList indexOfObject:cell])];
         }
     }
-    [self postAction:KITableViewActionTypeOfReplacement indexes:indexes animation:animation];
+    [self postAction:KISecionActionTypeOfReloadRows indexes:indexes animation:animation];
 }
 
 - (NSArray *)cells {
